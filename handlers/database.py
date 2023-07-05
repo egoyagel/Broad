@@ -1,12 +1,14 @@
 # (c) N A C BOTS
 
 import datetime
-
 import motor.motor_asyncio
-
+import dns.resolver
 
 class Database:
     def __init__(self, uri, database_name):
+        dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
+        dns.resolver.default_resolver.nameservers = ['8.8.8.8', '8.8.4.4']  # DNS sunucularını değiştirmek isterseniz, bu listeyi güncelleyin
+        
         self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
         self.db = self._client[database_name]
         self.col = self.db.users
@@ -89,3 +91,4 @@ class Database:
     async def total_notif_users_count(self):
         count = await self.col.count_documents({"notif": True})
         return count
+        
